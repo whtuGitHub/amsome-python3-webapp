@@ -55,7 +55,7 @@ def get_named_kw_args(fn):
 
 def has_named_kw_args(fn):
 	params = inspect.signature(fn).parameters
-	for name, param in parameters.items():
+	for name, param in params.items():
 		if param.kind == inspect.Parameter.KEYWORD_ONLY:
 			return True
 		
@@ -112,7 +112,7 @@ class RequestHandler(object):
 					for k, v in parse.parse_qs(qs,True).items():
 						kw[k] = v[0]
 		if kw is None:
-			kw = dict(**request.math_info)
+			kw = dict(**request.match_info)
 		else:
 			if not self._has_var_kw_arg and self._named_kw_args:
 				# remove all unamed kw:
@@ -142,7 +142,7 @@ class RequestHandler(object):
 
 def add_static(app):
 	path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
-	app.router.add_static('/static/'\, path)
+	app.router.add_static('/static/', path)
 	logging.info('add static %s => %s' %('/static/', path))
 
 def add_route(app, fn):
