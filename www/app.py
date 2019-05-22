@@ -21,7 +21,7 @@ from coroweb import add_routes, add_static
 def init_jinja2(app, **kw):
 	logging.info('init jinja2...')
 	options = dict(
-		autoescpe = kw.get('autoescpe', True),
+		autoescape = kw.get('autoescape', True),
 		block_start_string = kw.get('block_start_string', '{%'),
 		block_end_string = kw.get('block_end_string', '%}'),
 		variable_start_string = kw.get('variable_start_string', '{{'),
@@ -34,8 +34,8 @@ def init_jinja2(app, **kw):
 	logging.info('set jinja2 template path: %s' % path)
 	env = Environment(loader = FileSystemLoader(path), **options)
 	filters = kw.get('filters', None)
-	if filter is not None:
-		for name, f in filter.items():
+	if filters is not None:
+		for name, f in filters.items():
 			env.filters[name] = f
 	app['__template__'] = env
 
@@ -52,7 +52,7 @@ async def data_factory(app, handler):
 			if request.content_type.startswith('application/json'):
 				request.__data__ = await request.json()
 				logging.info('request json: %s' % str(request.__data__))
-			elif request.content_type.startswith('application/x-www-form-urlencoded')
+			elif request.content_type.startswith('application/x-www-form-urlencoded'):
 				request.__data__ = await request.post()
 				logging.info('request form: %s' % str(request.__data__))
 		return (await handler(request))
@@ -106,11 +106,11 @@ def datetime_filter(t):
 		return u'%s小时前' % (delta // 3600)
 	if delta < 604800:
 		return u'%天前' % (delta // 86400)
-	dt datetime.fromtimestamp(t)
+	dt = datetime.fromtimestamp(t)
 	return u'%s年%s月%s日' % (dt.year, dt.month, dt.day)
 	
 async def init(loop):
-	await orm.create_pool(loop = loop, host = '127.0.0.1', port = 3306, user = 'www', password = 'www', db = 'awesome')
+	await orm.create_pool(loop = loop, host = '127.0.0.1', port = 3306, user = 'www-data', password = 'www-data', db = 'awesome')
 	app = web.Application(loop=loop, middlewares = [
 		logger_factory, response_factory
 		])
